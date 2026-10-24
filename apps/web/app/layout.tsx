@@ -1,14 +1,22 @@
-import { Geist, Geist_Mono } from "next/font/google"
+import { Anta } from "next/font/google"
+import type { Metadata } from "next"
 
 import "@workspace/ui/globals.css"
+import "flag-icons/css/flag-icons.min.css"
 import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@workspace/ui/lib/utils"
 
-const geist = Geist({subsets:['latin'],variable:'--font-sans'})
+export const metadata: Metadata = {
+  title: "FCStats",
+  description:
+    "Explore detailed Counter-Strike 2 FACEIT player stats, ELO, match history, K/D, ADR, win rates, and map performance with FCStats.",
+}
 
-const fontMono = Geist_Mono({
+const anta = Anta({
+  variable: "--font-anta",
   subsets: ["latin"],
-  variable: "--font-mono",
+  weight: "400",
+  display: "swap",
 })
 
 export default function RootLayout({
@@ -20,7 +28,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={cn("antialiased", fontMono.variable, "font-sans", geist.variable)}
+      className={cn("antialiased", "font-sans", anta.variable)}
     >
       <body>
         <ThemeProvider>{children}</ThemeProvider>

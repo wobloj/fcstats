@@ -3,11 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "turbo format",
-    "typecheck": "turbo typecheck"
+    "build": "turbo build --ui=tui",
+    "dev": "turbo dev --ui=tui",
+    "lint": "turbo lint --ui=tui",
+    "format": "turbo format --ui=tui",
+    "typecheck": "turbo typecheck --ui=tui"
   },
   "devDependencies": {
     "@workspace/eslint-config": "*",
@@ -24,5 +24,11 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "country-code-emoji": "^2.3.0",
+    "country-list": "^2.4.1",
+    "dotenv": "^18.0.8",
+    "motion": "^14.6.0"
+  }
 }
