@@ -5,6 +5,7 @@ import "@workspace/ui/globals.css"
 import "flag-icons/css/flag-icons.min.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@workspace/ui/lib/utils"
+import { Toaster } from "@workspace/ui/components/toast"
 
 export const metadata: Metadata = {
   title: "FCStats",
@@ -31,7 +32,9 @@ export default function RootLayout({
       className={cn("antialiased", "font-sans", anta.variable)}
     >
       <body>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <Toaster>{children}</Toaster>
+        </ThemeProvider>
       </body>
     </html>
   )

@@ -2,22 +2,7 @@ import { faceitFetch } from "@/lib/faceit"
 import type { FaceitMatchHistoryItem } from "@/lib/faceit-types"
 
 export const MATCH_HISTORY_PAGE_SIZE = 5
-
-type FaceitHistoryPage = {
-  items?: Array<{
-    match_id: string
-    started_at?: number
-    finished_at?: number
-    results?: {
-      winner?: string
-      score?: Record<string, number | string>
-    }
-    teams?: Record<
-      string,
-      { name?: string; nickname?: string; team_id?: string }
-    >
-  }>
-}
+const MATCH_HISTORY_ENRICHMENT_CONCURRENCY = 2
 
 type FaceitMatchStats = {
   rounds?: Array<{
@@ -31,6 +16,22 @@ type FaceitMatchStats = {
           player_stats?: Record<string, string | number>
         }>
       }
+    >
+  }>
+}
+
+type FaceitHistoryPage = {
+  items?: Array<{
+    match_id: string
+    started_at?: number
+    finished_at?: number
+    results?: {
+      winner?: string
+      score?: Record<string, number | string>
+    }
+    teams?: Record<
+      string,
+      { name?: string; nickname?: string; team_id?: string }
     >
   }>
 }
@@ -293,27 +294,6 @@ async function enrichMatch(
   }
 }
 
-async function enrichMatchWithRetry(
-  playerId: string,
-  match: NonNullable<FaceitHistoryPage["items"]>[number]
-) {
-  for (let attempt = 0; ; attempt += 1) {
-    try {
-      return await enrichMatch(playerId, match)
-    } catch (error) {
-      if (
-        !(error instanceof Error) ||
-        error.message !== "FACEIT_RATE_LIMIT" ||
-        attempt >= 3
-      ) {
-        throw error
-      }
-
-      await new Promise((resolve) => setTimeout(resolve, 500 * 2 ** attempt))
-    }
-  }
-}
-
 export async function getPlayerMatchHistoryPage(
   playerId: string,
   offset: number,
@@ -326,10 +306,17 @@ export async function getPlayerMatchHistoryPage(
   const matches = items.slice(0, limit)
   const enrichedMatches: FaceitMatchHistoryItem[] = []
 
-  for (let offset = 0; offset < matches.length; offset += 2) {
-    const batch = matches.slice(offset, offset + 2)
+  for (
+    let offset = 0;
+    offset < matches.length;
+    offset += MATCH_HISTORY_ENRICHMENT_CONCURRENCY
+  ) {
+    const batch = matches.slice(
+      offset,
+      offset + MATCH_HISTORY_ENRICHMENT_CONCURRENCY
+    )
     const results = await Promise.allSettled(
-      batch.map((match) => enrichMatchWithRetry(playerId, match))
+      batch.map((match) => enrichMatch(playerId, match))
     )
 
     results.forEach((result, index) => {
@@ -361,4 +348,45 @@ export async function getPlayerMatchHistoryPage(
     matches: enrichedMatches,
     hasMore: items.length === limit,
   }
+}
+
+function normalizeMapName(map: string | null) {
+  const normalized = map
+    ?.trim()
+    .toLowerCase()
+    .replace(/^de[_\s-]?/, "")
+    .replace(/[^a-z0-9]/g, "")
+
+  return normalized === "dustii" ? "dust2" : normalized
+}
+
+export async function getPlayerFilteredMatchHistoryPage(
+  playerId: string,
+  offset: number,
+  selectedMaps: string[],
+  limit = MATCH_HISTORY_PAGE_SIZE
+) {
+  const pageSize = Math.min(limit, MATCH_HISTORY_PAGE_SIZE)
+  const normalizedMaps = new Set(selectedMaps.map(normalizeMapName))
+  const matches: FaceitMatchHistoryItem[] = []
+  let cursor = offset
+  let hasMore = true
+
+  while (matches.length < pageSize && hasMore) {
+    const page = await getPlayerMatchHistoryPage(
+      playerId,
+      cursor,
+      MATCH_HISTORY_PAGE_SIZE
+    )
+    cursor += page.matches.length
+    hasMore = page.hasMore
+    matches.push(
+      ...page.matches.filter((match) =>
+        normalizedMaps.has(normalizeMapName(match.map))
+      )
+    )
+    matches.splice(pageSize)
+  }
+
+  return { matches, hasMore, nextOffset: cursor }
 }

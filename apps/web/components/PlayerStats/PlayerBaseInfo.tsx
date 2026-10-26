@@ -49,6 +49,10 @@ const ELO_LEVELS = [
   { level: 10, minimum: 2001, maximum: null },
 ] as const
 
+const COUNTRY_NAME_OVERRIDES: Record<string, string> = {
+  KR: "South Korea",
+}
+
 function getLevelProgress(elo: number, challengerElo: number | null) {
   const currentLevel = ELO_LEVELS.find(
     ({ maximum }) => maximum === null || elo <= maximum
@@ -128,7 +132,9 @@ export default function PlayerBaseInfo({
   const country =
     countryCode && /^[a-z]{2}$/i.test(countryCode)
       ? {
-          name: getName(countryCode),
+          name:
+            COUNTRY_NAME_OVERRIDES[countryCode.toUpperCase()] ??
+            getName(countryCode),
           code: countryCode.toLowerCase(),
         }
       : undefined
@@ -183,8 +189,8 @@ export default function PlayerBaseInfo({
   return (
     <div className="flex min-w-0 flex-1 flex-row justify-between">
       <div>
-        <div className="flex flex-row items-center gap-2">
-          <h2 className="mb-2 text-4xl font-bold">{data.player.nickname}</h2>
+        <div className="mb-2 flex flex-row items-center gap-2">
+          <h2 className="text-4xl font-bold">{data.player.nickname}</h2>
           {verified === undefined ? (
             ""
           ) : (
@@ -197,8 +203,7 @@ export default function PlayerBaseInfo({
             >
               {verified ? (
                 <div className="flex flex-row items-center gap-1">
-                  <Verified size={16} />
-                  Verified user
+                  <Verified size={24} />
                 </div>
               ) : (
                 ""
@@ -235,8 +240,9 @@ export default function PlayerBaseInfo({
                   href={`https://steamcommunity.com/profiles/${steamId}`}
                   target="_blank"
                   rel="noreferrer"
+                  title={steamId}
                 >
-                  {steamId}
+                  {steamId.length > 10 ? `${steamId.slice(0, 10)}...` : steamId}
                   <ExternalLink size={16} />
                 </a>
               </p>

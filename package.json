@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "turbo build --ui=tui",
-    "dev": "turbo dev --ui=tui",
+    "dev": "npm run dev --workspace=web",
     "lint": "turbo lint --ui=tui",
     "format": "turbo format --ui=tui",
     "typecheck": "turbo typecheck --ui=tui"

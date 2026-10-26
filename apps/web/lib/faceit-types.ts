@@ -25,6 +25,13 @@ export type FaceitStatsRangeData = {
   matches: number
 }
 
+export type FaceitMapStats = {
+  map: string
+  matches: number
+  wins: number
+  winRate: number
+}
+
 export type FaceitMatchHistoryItem = {
   match_id: string
   started_at?: number

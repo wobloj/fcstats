@@ -1,14 +1,21 @@
 import { NextRequest, NextResponse } from "next/server"
+import { unstable_cache } from "next/cache"
 import { faceitErrorResponse } from "@/lib/faceit-error-response"
 import { faceitFetch } from "@/lib/faceit"
+import { getFaceitMatchStats } from "@/lib/faceit-match-stats"
 import {
   getBasicStatsFromMatches,
   type FaceitMatchPlayerStats,
 } from "@/lib/faceit-stats"
-import type { FaceitStatsRangeData } from "@/lib/faceit-types"
+import type {
+  FaceitStatsRange,
+  FaceitStatsRangeData,
+} from "@/lib/faceit-types"
 
 const HISTORY_PAGE_SIZE = 100
-const MATCH_STATS_CONCURRENCY = 5
+const MATCH_STATS_CONCURRENCY = 2
+const RATE_LIMIT_RETRIES = 3
+const RANGE_STATS_CACHE_SECONDS = 15 * 60
 
 type FaceitHistory = {
   items?: Array<{
@@ -19,22 +26,6 @@ type FaceitHistory = {
       score?: Record<string, string | number>
     }
     teams?: Record<string, { team_id?: string }>
-  }>
-}
-
-type FaceitMatchStats = {
-  rounds?: Array<{
-    round_stats?: { Rounds?: string | number }
-    teams?: Record<
-      string,
-      {
-        team_id?: string
-        players?: Array<{
-          player_id: string
-          player_stats?: Record<string, string | number>
-        }>
-      }
-    >
   }>
 }
 
@@ -56,12 +47,32 @@ function numericStat(stats: Record<string, string | number>, key: string) {
   return Number.isFinite(parsed) ? parsed : null
 }
 
+async function faceitFetchWithRetry<T>(path: string): Promise<T> {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return await faceitFetch<T>(path)
+    } catch (error) {
+      if (
+        !(error instanceof Error) ||
+        error.message !== "FACEIT_RATE_LIMIT" ||
+        attempt >= RATE_LIMIT_RETRIES
+      ) {
+        throw error
+      }
+
+      await new Promise((resolve) =>
+        setTimeout(resolve, 500 * 2 ** attempt)
+      )
+    }
+  }
+}
+
 async function getMatchHistory(playerId: string, from: number, to: number) {
   const matches: NonNullable<FaceitHistory["items"]> = []
   let offset = 0
 
   while (true) {
-    const page = await faceitFetch<FaceitHistory>(
+    const page = await faceitFetchWithRetry<FaceitHistory>(
       `/players/${encodeURIComponent(playerId)}/history?game=cs2&from=${from}&to=${to}&offset=${offset}&limit=${HISTORY_PAGE_SIZE}`
     )
     const items = page.items ?? []
@@ -157,9 +168,7 @@ async function getMatchPlayerStats(
   score?: Record<string, string | number>,
   historyTeams?: Record<string, { team_id?: string }>
 ): Promise<{ stats: FaceitMatchPlayerStats; won: boolean | null } | null> {
-  const match = await faceitFetch<FaceitMatchStats>(
-    `/matches/${encodeURIComponent(matchId)}/stats`
-  )
+  const match = await getFaceitMatchStats(matchId)
   const aggregateStats: Record<string, string | number> = {}
   let totalRounds = 0
   let weightedAdr = 0
@@ -216,6 +225,78 @@ async function getMatchPlayerStats(
   }
 }
 
+async function calculateRangeStats(
+  playerId: string,
+  range: Exclude<FaceitStatsRange, "lifetime">
+): Promise<FaceitStatsRangeData> {
+  const to = Math.floor(Date.now() / 1000)
+  const days = range === "30d" ? 30 : 90
+  const from = to - days * 24 * 60 * 60
+  const history = await getMatchHistory(playerId, from, to)
+  const completedMatches = history.filter(
+    (match) =>
+      match.match_id !== undefined &&
+      match.finished_at !== undefined &&
+      match.finished_at >= from &&
+      match.finished_at <= to
+  )
+  const playerMatchStats: FaceitMatchPlayerStats[] = []
+  let wins = 0
+  let decidedMatches = 0
+
+  for (
+    let index = 0;
+    index < completedMatches.length;
+    index += MATCH_STATS_CONCURRENCY
+  ) {
+    const batch = completedMatches.slice(
+      index,
+      index + MATCH_STATS_CONCURRENCY
+    )
+    const batchStats = await Promise.all(
+      batch.map((historyMatch) =>
+        getMatchPlayerStats(
+          historyMatch.match_id,
+          playerId,
+          historyMatch.results?.winner,
+          historyMatch.results?.score,
+          historyMatch.teams
+        )
+      )
+    )
+
+    for (const result of batchStats) {
+      if (!result) {
+        continue
+      }
+
+      playerMatchStats.push(result.stats)
+      if (result.won !== null) {
+        decidedMatches += 1
+      }
+      if (result.won === true) {
+        wins += 1
+      }
+    }
+  }
+
+  return {
+    range,
+    basicStats: getBasicStatsFromMatches(
+      playerMatchStats,
+      wins,
+      decidedMatches
+    ),
+    matches: playerMatchStats.length,
+  }
+}
+
+const getCachedRangeStats = unstable_cache(
+  calculateRangeStats,
+  ["faceit-player-range-stats-v1"],
+  { revalidate: RANGE_STATS_CACHE_SECONDS }
+)
+
 export async function GET(request: NextRequest) {
   const playerId = request.nextUrl.searchParams.get("playerId")
   const range = request.nextUrl.searchParams.get("range")
@@ -235,74 +316,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const to = Math.floor(Date.now() / 1000)
-    const days = range === "30d" ? 30 : 90
-    const from = to - days * 24 * 60 * 60
-    const history = await getMatchHistory(playerId, from, to)
-    const completedMatches = history.filter(
-      (match) =>
-        match.match_id !== undefined &&
-        match.finished_at !== undefined &&
-        match.finished_at >= from &&
-        match.finished_at <= to
-    )
-    const playerMatchStats: FaceitMatchPlayerStats[] = []
-    let wins = 0
-    let decidedMatches = 0
-
-    for (
-      let index = 0;
-      index < completedMatches.length;
-      index += MATCH_STATS_CONCURRENCY
-    ) {
-      const batch = completedMatches.slice(
-        index,
-        index + MATCH_STATS_CONCURRENCY
-      )
-      const batchStats = await Promise.all(
-        batch.map(async (historyMatch) => {
-          const stats = await getMatchPlayerStats(
-            historyMatch.match_id,
-            playerId,
-            historyMatch.results?.winner,
-            historyMatch.results?.score,
-            historyMatch.teams
-          )
-
-          if (!stats) {
-            return null
-          }
-
-          return stats
-        })
-      )
-
-      for (const result of batchStats) {
-        if (!result) {
-          continue
-        }
-
-        playerMatchStats.push(result.stats)
-        if (result.won !== null) {
-          decidedMatches += 1
-        }
-        if (result.won === true) {
-          wins += 1
-        }
-      }
-    }
-
-    const response: FaceitStatsRangeData = {
-      range,
-      basicStats: getBasicStatsFromMatches(
-        playerMatchStats,
-        wins,
-        decidedMatches
-      ),
-      matches: playerMatchStats.length,
-    }
-
-    return NextResponse.json(response)
+    const result = await getCachedRangeStats(playerId, range)
+    return NextResponse.json(result)
   } catch (error) {
     return faceitErrorResponse(error)
   }

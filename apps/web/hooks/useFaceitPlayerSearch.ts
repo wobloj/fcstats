@@ -14,7 +14,6 @@ export default function useFaceitPlayerSearch() {
 
     setLoading(true)
     setError("")
-    setData(null)
 
     try {
       const response = await fetch(

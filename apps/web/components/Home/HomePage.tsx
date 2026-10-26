@@ -8,7 +8,10 @@ export default function HomePage({
   searchbarProps,
   hasResults,
 }: {
-  searchbarProps: Pick<SearchbarProps, "onSubmit" | "isLoading">
+  searchbarProps: Pick<
+    SearchbarProps,
+    "onSubmit" | "isLoading" | "recentSearches"
+  >
   hasResults: boolean
 }) {
   return (
