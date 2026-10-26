@@ -55,7 +55,12 @@ export default function HomePage({
           className={hasResults ? "mt-0" : "mt-10"}
           transition={{ layout: { duration: 0.65, ease: [0.22, 1, 0.36, 1] } }}
         >
-          <Searchbar maxWidth="full" size="lg" {...searchbarProps} />
+          <Searchbar
+            maxWidth="full"
+            size="lg"
+            animatePlaceholder={!hasResults}
+            {...searchbarProps}
+          />
         </motion.div>
       </motion.div>
     </motion.section>

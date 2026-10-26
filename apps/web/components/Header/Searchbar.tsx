@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Search } from "lucide-react"
 import {
   Avatar,
@@ -18,6 +18,13 @@ export type RecentPlayerSearch = {
   nickname: string
   avatar?: string
 }
+
+const animatedPlaceholderNicknames = [
+  "donk666",
+  "m0NESY",
+  "ZywOo",
+  "s1mplecsgod",
+]
 
 const maxWidthClasses = {
   "64": "max-w-64",
@@ -54,6 +61,7 @@ export type SearchbarProps = {
   onSubmit: (nickname: string) => void | Promise<void>
   isLoading?: boolean
   recentSearches?: RecentPlayerSearch[]
+  animatePlaceholder?: boolean
 }
 
 export default function Searchbar({
@@ -62,12 +70,67 @@ export default function Searchbar({
   onSubmit,
   isLoading = false,
   recentSearches = [],
+  animatePlaceholder = false,
 }: SearchbarProps) {
   const [value, setValue] = useState("")
+  const [animatedPlaceholderText, setAnimatedPlaceholderText] = useState("")
   const classes = sizeClasses[size ?? "sm"]
 
+  useEffect(() => {
+    if (!animatePlaceholder || value.length > 0) {
+      setAnimatedPlaceholderText("")
+      return
+    }
+
+    let nicknameIndex = 0
+    let characterIndex = 0
+    let deleting = false
+    let timeoutId: ReturnType<typeof setTimeout>
+
+    const animate = () => {
+      const nickname = animatedPlaceholderNicknames[nicknameIndex]
+      if (nickname === undefined) {
+        throw new Error(
+          "Add at least one nickname to the animated placeholder list."
+        )
+      }
+
+      if (!deleting) {
+        characterIndex += 1
+        setAnimatedPlaceholderText(nickname.slice(0, characterIndex))
+
+        if (characterIndex === nickname.length) {
+          deleting = true
+          timeoutId = setTimeout(animate, 1200)
+        } else {
+          timeoutId = setTimeout(animate, 110)
+        }
+
+        return
+      }
+
+      characterIndex -= 1
+      setAnimatedPlaceholderText(nickname.slice(0, characterIndex))
+
+      if (characterIndex === 0) {
+        deleting = false
+        nicknameIndex =
+          (nicknameIndex + 1) % animatedPlaceholderNicknames.length
+        timeoutId = setTimeout(animate, 400)
+      } else {
+        timeoutId = setTimeout(animate, 55)
+      }
+    }
+
+    timeoutId = setTimeout(animate, 400)
+
+    return () => clearTimeout(timeoutId)
+  }, [animatePlaceholder, value])
+
   return (
-    <div className={`grow basis-0 ${maxWidth ? maxWidthClasses[maxWidth] : ""}`}>
+    <div
+      className={`grow basis-0 ${maxWidth ? maxWidthClasses[maxWidth] : ""}`}
+    >
       <form
         onSubmit={(event) => {
           event.preventDefault()
@@ -77,7 +140,11 @@ export default function Searchbar({
         <InputGroup className={classes.group}>
           <InputGroupInput
             className={classes.input}
-            placeholder="Search player..."
+            placeholder={
+              "type: " + animatePlaceholder
+                ? animatedPlaceholderText || "Search player..."
+                : "Search player..."
+            }
             value={value}
             onChange={(event) => setValue(event.target.value)}
           />
