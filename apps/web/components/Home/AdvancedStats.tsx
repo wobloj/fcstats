@@ -187,7 +187,7 @@ export default function AdvancedStats({
   }
 
   return (
-    <div className="flex flex-row justify-around gap-4 pt-4">
+    <div className="grid grid-cols-1 justify-around gap-4 pt-4 md:grid-cols-4">
       {ADVANCED_STAT_CATEGORIES.map(({ title, stats: categoryStats }) => (
         <section key={title} className="flex-1 rounded-md bg-card p-4">
           <h3 className="mb-3 text-lg font-semibold">{title}</h3>

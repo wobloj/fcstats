@@ -12,11 +12,17 @@ export default function PlayerTab({
   game?: FaceitGame
 }) {
   return (
-    <section className="flex flex-wrap items-center gap-4 rounded-md bg-card p-5">
+    <section
+      className={`grid min-w-0 gap-4 rounded-md bg-card p-5 md:flex md:flex-wrap md:items-center ${
+        avatarUrl ? "grid-cols-[auto_minmax(0,1fr)]" : "grid-cols-1"
+      }`}
+    >
       {avatarUrl && (
-        <Avatars avatarUrl={avatarUrl} skillLevel={game?.skill_level} />
+        <div className="col-start-1 row-start-1 md:contents">
+          <Avatars avatarUrl={avatarUrl} skillLevel={game?.skill_level} />
+        </div>
       )}
-      <PlayerBaseInfo data={data} game={game} />
+      <PlayerBaseInfo data={data} game={game} hasAvatar={Boolean(avatarUrl)} />
     </section>
   )
 }

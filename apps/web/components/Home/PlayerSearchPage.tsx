@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import Header from "@/components/Header/Header"
 import HomePage from "@/components/Home/HomePage"
 import PlayerSearchResults from "@/components/Home/PlayerSearchResults"
@@ -50,10 +50,25 @@ function readRecentSearches(): RecentPlayerSearch[] {
     .slice(0, MAX_RECENT_SEARCHES)
 }
 
-export default function PlayerSearchPage() {
+export default function PlayerSearchPage({
+  initialNickname,
+}: {
+  initialNickname?: string
+}) {
   const search = useFaceitPlayerSearch()
+  const initialNicknameHandled = useRef<string | null>(null)
   const [recentSearches, setRecentSearches] = useState<RecentPlayerSearch[]>([])
   const [recentSearchesLoaded, setRecentSearchesLoaded] = useState(false)
+
+  useEffect(() => {
+    const searchTerm = initialNickname?.trim()
+    if (!searchTerm || initialNicknameHandled.current === searchTerm) {
+      return
+    }
+
+    initialNicknameHandled.current = searchTerm
+    void search.searchPlayer(searchTerm)
+  }, [initialNickname, search.searchPlayer])
 
   useEffect(() => {
     setRecentSearches(readRecentSearches())
@@ -118,11 +133,20 @@ export default function PlayerSearchPage() {
   }
 
   return (
-    <main className="min-h-screen space-y-8 bg-secondary">
+    <main className="relative isolate min-h-screen space-y-8 bg-secondary">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute top-0 left-1/2 z-0 h-[60vw] w-[75vw] -translate-x-1/2 -translate-y-8/12 rounded-full blur-3xl"
+        style={{
+          background:
+            "radial-gradient(ellipse at center, color-mix(in oklch, var(--primary) 24%, transparent) 24%, var(--secondary) 70%)",
+        }}
+      />
       <Header
         searchbarProps={{
           onSubmit: searchbarProps.onSubmit,
           isLoading: searchbarProps.isLoading,
+          recentSearches: searchbarProps.recentSearches,
         }}
         hasResults={search.data !== null}
       />
@@ -131,7 +155,7 @@ export default function PlayerSearchPage() {
         hasResults={search.data !== null}
       />
 
-      <section className="mx-auto max-w-7xl space-y-8 px-6 pb-12">
+      <section className="relative z-10 mx-auto max-w-7xl space-y-8 px-6 pb-12">
         {search.loading && <Loading customName="Loading user data" />}
         {search.data && (
           <PlayerSearchResults

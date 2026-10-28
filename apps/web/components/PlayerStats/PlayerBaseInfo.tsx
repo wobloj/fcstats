@@ -124,9 +124,11 @@ function getLevelProgress(elo: number, challengerElo: number | null) {
 export default function PlayerBaseInfo({
   data,
   game,
+  hasAvatar,
 }: {
   data: FaceitPlayerData
   game?: FaceitGame
+  hasAvatar: boolean
 }) {
   const countryCode = data.player.country
   const country =
@@ -187,10 +189,16 @@ export default function PlayerBaseInfo({
       : null
 
   return (
-    <div className="flex min-w-0 flex-1 flex-row justify-between">
-      <div>
-        <div className="mb-2 flex flex-row items-center gap-2">
-          <h2 className="text-4xl font-bold">{data.player.nickname}</h2>
+    <div className="contents md:flex md:min-w-0 md:flex-1 md:flex-row md:justify-between">
+      <div className="contents md:block md:min-w-0 md:flex-1">
+        <div
+          className={`row-start-1 mb-2 flex min-w-0 flex-row items-center gap-2 md:col-auto md:row-auto ${
+            hasAvatar ? "col-start-2" : "col-span-full"
+          }`}
+        >
+          <h2 className="text-2xl font-bold md:text-4xl">
+            {data.player.nickname}
+          </h2>
           {verified === undefined ? (
             ""
           ) : (
@@ -211,9 +219,9 @@ export default function PlayerBaseInfo({
             </span>
           )}
         </div>
-        <div className="flex flex-row items-center gap-3 text-sm">
-          <div className="w-fit rounded-md bg-secondary p-2">
-            {country?.name && (
+        <div className="col-span-full row-start-2 flex w-full flex-col items-stretch gap-3 text-sm md:col-auto md:row-auto md:flex-row md:items-center">
+          {country?.name && (
+            <div className="w-full flex-1 rounded-md bg-secondary p-2 md:w-fit">
               <p className="text-muted-foreground">
                 <span
                   className={`fi fi-${country.code}`}
@@ -222,16 +230,16 @@ export default function PlayerBaseInfo({
                 />{" "}
                 {country.name}
               </p>
-            )}
-          </div>
-          <div className="rounded-md bg-secondary p-2">
+            </div>
+          )}
+          <div className="w-full flex-1 rounded-md bg-secondary p-2 md:w-fit">
             <p className="flex flex-row items-center gap-1 text-muted-foreground">
               <Clock size={16} />
               Member Since {joinedDate}
             </p>
           </div>
-          <div className="rounded-md bg-secondary p-2">
-            {steamId && (
+          {steamId && (
+            <div className="mr-8 w-full flex-1 rounded-md bg-secondary p-2 md:w-fit">
               <p className="flex flex-row items-center gap-1">
                 <Gamepad2 size={16} />
                 Steam:{" "}
@@ -246,13 +254,15 @@ export default function PlayerBaseInfo({
                   <ExternalLink size={16} />
                 </a>
               </p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        <div className="mt-4 flex flex-row items-center gap-3 text-sm">
-          <div>
-            <p className={`flex flex-row gap-2 font-medium ${streakColor}`}>
+        <div className="contents md:mt-4 md:flex md:items-center md:gap-3 md:text-sm">
+          <div className="col-span-full row-start-3 mt-4 flex items-center gap-3 text-sm md:col-auto md:row-auto md:mt-0">
+            <p
+              className={`flex w-full flex-row justify-center gap-2 font-medium md:w-fit md:justify-start ${streakColor}`}
+            >
               {latestResult === "win" ? (
                 <Flame size={16} />
               ) : (
@@ -261,9 +271,9 @@ export default function PlayerBaseInfo({
               {streakLabel}
             </p>
           </div>
-          <div>
-            <div className="flex flex-row gap-2">
-              <div className="flex flex-row gap-4 font-extralight">
+          <div className="col-span-full row-start-4 min-w-0 md:col-auto md:row-auto">
+            <div className="flex flex-row flex-wrap justify-center gap-2 text-sm md:justify-start">
+              <div className="flex flex-row gap-1 font-extralight md:gap-4">
                 <p>
                   Rank: {rankingRegion ? ` ${rankingRegion.toUpperCase()}` : ""}
                 </p>
@@ -272,7 +282,7 @@ export default function PlayerBaseInfo({
                   : `#${data.rankings.global.toLocaleString("pl-PL")}`}
               </div>
               {" | "}
-              <div className="flex flex-row gap-4 font-extralight">
+              <div className="flex flex-row gap-1 font-extralight md:gap-4">
                 <p>Regional: {rankingCountry ? ` ${rankingCountry}` : ""}</p>
                 {data.rankings.regional === null
                   ? "Brak danych"
@@ -282,7 +292,7 @@ export default function PlayerBaseInfo({
           </div>
         </div>
       </div>
-      <div className="flex h-full w-5/12 min-w-64 flex-col gap-3 rounded-md bg-background/20 p-4">
+      <div className="col-span-full row-start-5 flex min-w-0 flex-col gap-3 rounded-md bg-background/20 p-4 md:col-auto md:row-auto md:h-full md:w-5/12 md:min-w-64">
         <div>
           <p className="text-sm text-muted-foreground">ELO</p>
           <p className="text-3xl font-bold tabular-nums">

@@ -149,10 +149,13 @@ export default function RecentMatches({
               </p>
             )}
             {!error && recentMatches.length > 0 && (
-              <ChartContainer config={chartConfig} className="h-5 w-1/2">
+              <ChartContainer
+                config={chartConfig}
+                className="h-5 w-full md:w-1/2"
+              >
                 <BarChart
                   accessibilityLayer
-                  data={chartData}
+                  data={chartData.reverse()}
                   margin={{ left: 4, right: 4, top: 0, bottom: 0 }}
                   barCategoryGap={2}
                 >
