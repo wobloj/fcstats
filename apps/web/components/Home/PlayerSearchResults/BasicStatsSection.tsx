@@ -59,13 +59,13 @@ export default function BasicStatsSection({
       valueClassName: getKdaColorClass(selectedStats?.kda),
     },
     {
-      label: "AVG Headshot %",
+      label: "AVG HS %",
       value: selectedStats?.avgHeadshot,
       suffix: "%",
     },
     { label: "ADR", value: selectedStats?.adr, suffix: "" },
     {
-      label: "AVG Damage",
+      label: "AVG Dmg",
       value: selectedStats?.avgDamage,
       suffix: "",
     },
@@ -108,7 +108,7 @@ export default function BasicStatsSection({
               {error}
             </p>
           ) : selectedStats ? (
-            <div className="flex flex-row flex-wrap gap-4">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-6">
               {statCards.map(({ label, value, suffix, valueClassName }) => (
                 <article key={label} className="flex-1 rounded-md bg-card p-4">
                   <p className="text-sm text-gray-500">{label}</p>

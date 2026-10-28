@@ -26,7 +26,7 @@ export default function Navbar() {
           <NavigationMenuLink
             render={
               <Link href="/" className="flex-row items-center gap-2">
-                Dashboard
+                Home
               </Link>
             }
           />

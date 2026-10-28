@@ -20,7 +20,7 @@ import {
   Verified,
   HeartCrack,
 } from "lucide-react"
-import { Progress } from "@workspace/ui/components/progress"
+import { Progress, ProgressLabel } from "@workspace/ui/components/progress"
 
 const LEVEL_BADGES = [
   level1Badge,
@@ -189,10 +189,10 @@ export default function PlayerBaseInfo({
       : null
 
   return (
-    <div className="contents md:flex md:min-w-0 md:flex-1 md:flex-row md:justify-between">
+    <div className="contents md:flex md:min-w-0 md:flex-1 md:flex-row md:items-center md:justify-between">
       <div className="contents md:block md:min-w-0 md:flex-1">
         <div
-          className={`row-start-1 mb-2 flex min-w-0 flex-row items-center gap-2 md:col-auto md:row-auto ${
+          className={`row-start-1 flex min-w-0 flex-row items-center gap-2 self-start md:col-auto md:row-auto md:mb-2 ${
             hasAvatar ? "col-start-2" : "col-span-full"
           }`}
         >
@@ -219,12 +219,16 @@ export default function PlayerBaseInfo({
             </span>
           )}
         </div>
-        <div className="col-span-full row-start-2 flex w-full flex-col items-stretch gap-3 text-sm md:col-auto md:row-auto md:flex-row md:items-center">
+        <div
+          className={`row-start-2 flex w-full flex-col items-stretch gap-1 text-xs md:col-auto md:row-auto md:flex-row md:items-center md:gap-3 md:text-sm ${
+            hasAvatar ? "col-start-2" : "col-span-full"
+          }`}
+        >
           {country?.name && (
-            <div className="w-full flex-1 rounded-md bg-secondary p-2 md:w-fit">
+            <div className="w-full rounded-md bg-secondary p-2 md:w-fit md:px-4 md:py-2">
               <p className="text-muted-foreground">
                 <span
-                  className={`fi fi-${country.code}`}
+                  className={`fi mr-2 fi-${country.code}`}
                   role="img"
                   aria-label={`${country.name} flag`}
                 />{" "}
@@ -232,14 +236,14 @@ export default function PlayerBaseInfo({
               </p>
             </div>
           )}
-          <div className="w-full flex-1 rounded-md bg-secondary p-2 md:w-fit">
+          <div className="w-full rounded-md bg-secondary p-2 md:w-fit md:px-4 md:py-2">
             <p className="flex flex-row items-center gap-1 text-muted-foreground">
               <Clock size={16} />
               Member Since {joinedDate}
             </p>
           </div>
           {steamId && (
-            <div className="mr-8 w-full flex-1 rounded-md bg-secondary p-2 md:w-fit">
+            <div className="mr-8 w-full rounded-md bg-secondary p-2 md:w-fit md:px-4 md:py-2">
               <p className="flex flex-row items-center gap-1">
                 <Gamepad2 size={16} />
                 Steam:{" "}
@@ -250,7 +254,14 @@ export default function PlayerBaseInfo({
                   rel="noreferrer"
                   title={steamId}
                 >
-                  {steamId.length > 10 ? `${steamId.slice(0, 10)}...` : steamId}
+                  <span className="md:hidden">
+                    {steamId.length > 5 ? `${steamId.slice(0, 5)}...` : steamId}
+                  </span>
+                  <span className="hidden md:inline">
+                    {steamId.length > 10
+                      ? `${steamId.slice(0, 10)}...`
+                      : steamId}
+                  </span>
                   <ExternalLink size={16} />
                 </a>
               </p>
@@ -292,9 +303,9 @@ export default function PlayerBaseInfo({
           </div>
         </div>
       </div>
-      <div className="col-span-full row-start-5 flex min-w-0 flex-col gap-3 rounded-md bg-background/20 p-4 md:col-auto md:row-auto md:h-full md:w-5/12 md:min-w-64">
-        <div>
-          <p className="text-sm text-muted-foreground">ELO</p>
+      <div className="col-span-full row-start-5 flex min-w-0 flex-col justify-center gap-2 rounded-md bg-background/20 p-4 md:col-auto md:row-auto md:h-full md:w-5/12 md:min-w-64">
+        <div className="flex flex-row justify-between">
+          <p className="text-base text-muted-foreground">ELO</p>
           <p className="text-3xl font-bold tabular-nums">
             {typeof currentElo === "number"
               ? currentElo.toLocaleString("pl-PL")
@@ -303,21 +314,7 @@ export default function PlayerBaseInfo({
         </div>
         {levelProgress && (
           <div className="flex flex-col gap-1.5">
-            <div className="flex items-center justify-between gap-2 text-xs">
-              <p className="text-right text-muted-foreground">
-                {levelProgress.maximum
-                  ? "Maksymalny poziom"
-                  : levelProgress.progress === null
-                    ? "Próg Challengera niedostępny"
-                    : levelProgress.remaining === null
-                      ? "Maksymalny poziom"
-                      : `${levelProgress.remaining.toLocaleString("pl-PL")} ELO do ${
-                          levelProgress.nextLevel === null
-                            ? "Challengera"
-                            : `poziomu ${levelProgress.nextLevel}`
-                        }`}
-              </p>
-            </div>
+            <div className="flex items-center justify-between gap-2 text-xs"></div>
             <div className="flex items-center gap-2">
               <Image
                 src={
@@ -337,7 +334,7 @@ export default function PlayerBaseInfo({
               {levelProgress.progress !== null && (
                 <Progress
                   value={levelProgress.progress}
-                  className="min-w-0 flex-1"
+                  className="mb-2 min-w-0 flex-1 justify-center gap-1"
                   aria-label={
                     levelProgress.maximum
                       ? "Maksymalny poziom FACEIT"
@@ -345,7 +342,17 @@ export default function PlayerBaseInfo({
                         ? "Postęp do progu Challengera"
                         : `Postęp do poziomu ${levelProgress.nextLevel}`
                   }
-                />
+                >
+                  <ProgressLabel className="text-center text-xs text-muted-foreground">
+                    {levelProgress.maximum
+                      ? ""
+                      : levelProgress.progress === null
+                        ? "Próg Challengera niedostępny"
+                        : levelProgress.remaining === null
+                          ? "Maksymalny poziom"
+                          : `+${levelProgress.remaining.toLocaleString("pl-PL")}`}
+                  </ProgressLabel>
+                </Progress>
               )}
               {!levelProgress.maximum && levelProgress.nextLevel !== null && (
                 <Image

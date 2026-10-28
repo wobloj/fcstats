@@ -13,12 +13,12 @@ export default function PlayerTab({
 }) {
   return (
     <section
-      className={`grid min-w-0 gap-4 rounded-md bg-card p-5 md:flex md:flex-wrap md:items-center ${
+      className={`grid min-w-0 gap-3 rounded-md bg-card p-5 md:flex md:flex-wrap md:items-center ${
         avatarUrl ? "grid-cols-[auto_minmax(0,1fr)]" : "grid-cols-1"
       }`}
     >
       {avatarUrl && (
-        <div className="col-start-1 row-start-1 md:contents">
+        <div className="col-start-1 row-span-2 row-start-1 self-center md:row-auto md:contents md:self-start">
           <Avatars avatarUrl={avatarUrl} skillLevel={game?.skill_level} />
         </div>
       )}
