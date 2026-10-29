@@ -72,8 +72,9 @@ function getChallengerElo(ranking: FaceitRanking | null) {
 
   return typeof challenger?.faceit_elo === "number" &&
     Number.isSafeInteger(challenger.faceit_elo) &&
-    challenger.faceit_elo > 0
-    ? challenger.faceit_elo
+    challenger.faceit_elo > 0 &&
+    Number.isSafeInteger(challenger.faceit_elo + 1)
+    ? challenger.faceit_elo + 1
     : null
 }
 

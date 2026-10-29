@@ -1,5 +1,7 @@
 import { getName } from "country-list"
 import type { FaceitGame, FaceitPlayerData } from "@/lib/faceit-types"
+import COUNTRY_NAME_OVERRIDES from "@/lib/country-name-overrides"
+import ELO_LEVELS from "@/lib/elo-levels"
 import Image from "next/image"
 import level1Badge from "@/lib/logo faceit/1.svg"
 import level2Badge from "@/lib/logo faceit/2.svg"
@@ -35,23 +37,6 @@ const LEVEL_BADGES = [
   level10Badge,
   challengerBadge,
 ] as const
-
-const ELO_LEVELS = [
-  { level: 1, minimum: 100, maximum: 800 },
-  { level: 2, minimum: 801, maximum: 950 },
-  { level: 3, minimum: 951, maximum: 1100 },
-  { level: 4, minimum: 1101, maximum: 1250 },
-  { level: 5, minimum: 1251, maximum: 1400 },
-  { level: 6, minimum: 1401, maximum: 1550 },
-  { level: 7, minimum: 1551, maximum: 1700 },
-  { level: 8, minimum: 1701, maximum: 1850 },
-  { level: 9, minimum: 1851, maximum: 2000 },
-  { level: 10, minimum: 2001, maximum: null },
-] as const
-
-const COUNTRY_NAME_OVERRIDES: Record<string, string> = {
-  KR: "South Korea",
-}
 
 function getLevelProgress(elo: number, challengerElo: number | null) {
   const currentLevel = ELO_LEVELS.find(
@@ -271,16 +256,18 @@ export default function PlayerBaseInfo({
 
         <div className="contents md:mt-4 md:flex md:items-center md:gap-3 md:text-sm">
           <div className="col-span-full row-start-3 mt-4 flex items-center gap-3 text-sm md:col-auto md:row-auto md:mt-0">
-            <p
-              className={`flex w-full flex-row justify-center gap-2 font-medium md:w-fit md:justify-start ${streakColor}`}
+            <div
+              className={`flex w-full flex-row items-center justify-center gap-2 font-medium md:w-fit md:justify-start ${streakColor}`}
             >
-              {latestResult === "win" ? (
-                <Flame size={16} />
-              ) : (
-                <HeartCrack size={16} />
-              )}
-              {streakLabel}
-            </p>
+              <span className="mb-0.5">
+                {latestResult === "win" ? (
+                  <Flame size={16} />
+                ) : (
+                  <HeartCrack size={16} />
+                )}
+              </span>
+              <p className="whitespace-nowrap">{streakLabel}</p>
+            </div>
           </div>
           <div className="col-span-full row-start-4 min-w-0 md:col-auto md:row-auto">
             <div className="flex flex-row flex-wrap justify-center gap-2 text-sm md:justify-start">

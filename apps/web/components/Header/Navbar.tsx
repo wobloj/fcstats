@@ -52,7 +52,7 @@ export default function Navbar() {
                     key={region}
                     render={
                       <Link
-                        href="/leaderboard"
+                        href={`/leaderboard?region=${region}`}
                         className="flex-row items-center gap-2"
                       >
                         {region}
@@ -120,7 +120,7 @@ export function MobileNavbar({ onNavigate }: { onNavigate: () => void }) {
           {leaderboardRegions.map((region) => (
             <Link
               key={region}
-              href="/leaderboard"
+              href={`/leaderboard?region=${region}`}
               onClick={onNavigate}
               className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
             >

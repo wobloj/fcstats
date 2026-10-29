@@ -85,3 +85,14 @@ export type FaceitAdditionalStatsData = {
   nickname: string
   stats: FaceitLifetimeStats
 }
+
+export type FaceitRankingItem = {
+  player_id: string
+  nickname: string
+  position: number
+  country?: string
+  faceit_elo: number
+  skill_level?: number
+  game_skill_level?: number
+  avatar?: string
+}

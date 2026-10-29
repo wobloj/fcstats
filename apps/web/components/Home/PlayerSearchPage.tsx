@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import Header from "@/components/Header/Header"
+import DecorativeGlow from "@/components/DecorativeGlow"
 import HomePage from "@/components/Home/HomePage"
 import PlayerSearchResults from "@/components/Home/PlayerSearchResults"
 import useFaceitPlayerSearch from "@/hooks/useFaceitPlayerSearch"
@@ -134,14 +135,7 @@ export default function PlayerSearchPage({
 
   return (
     <main className="relative isolate min-h-screen space-y-8 bg-secondary">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute top-0 left-1/2 z-0 h-[60vw] w-[75vw] -translate-x-1/2 -translate-y-8/12 rounded-full blur-3xl"
-        style={{
-          background:
-            "radial-gradient(ellipse at center, color-mix(in oklch, var(--primary) 24%, transparent) 24%, var(--secondary) 70%)",
-        }}
-      />
+      <DecorativeGlow />
       <Header
         searchbarProps={{
           onSubmit: searchbarProps.onSubmit,
