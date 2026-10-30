@@ -1,5 +1,5 @@
-import RoutePlaceholderPage from "@/components/RoutePlaceholderPage"
+import ProMatches from "@/components/ProMatches/ProMatches"
 
 export default function ProMatchesPage() {
-  return <RoutePlaceholderPage title="Pro Matches" />
+  return <ProMatches />
 }

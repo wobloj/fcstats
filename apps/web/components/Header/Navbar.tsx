@@ -64,11 +64,12 @@ export default function Navbar() {
             </ul>
           </NavigationMenuContent>
         </NavigationMenuItem>
+
         <NavigationMenuItem className="cursor-pointer">
           <NavigationMenuLink
             render={
-              <Link href="/pro-matches" className="flex-row items-center gap-2">
-                Pro Matches
+              <Link href="/compare" className="flex-row items-center gap-2">
+                Compare
               </Link>
             }
           />
@@ -76,8 +77,8 @@ export default function Navbar() {
         <NavigationMenuItem className="cursor-pointer">
           <NavigationMenuLink
             render={
-              <Link href="/compare" className="flex-row items-center gap-2">
-                Compare
+              <Link href="/pro-matches" className="flex-row items-center gap-2">
+                Matches
               </Link>
             }
           />

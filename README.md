@@ -48,3 +48,10 @@ there and its corresponding property to `FaceitBasicStats` in
 UI. `avgDamage` is calculated as total damage divided by matches. The FACEIT
 field used for `kda` is `Average K/D Ratio`, so it represents K/D rather than a
 K/D/A ratio.
+
+## Pro matches
+
+The Pro Matches page uses the Cito CS2 API. Set `CITO_API_KEY` in
+`apps/web/.env.local`; the key is used only by server-side API routes. Match
+feeds are read from the live, upcoming, and recent-results endpoints. Team
+rosters are loaded on demand when a match is expanded.
