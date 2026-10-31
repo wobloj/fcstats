@@ -1,6 +1,7 @@
 export type CitoRosterPlayer = {
   id: string
   nickname: string
+  role?: string
   name?: string
   imageUrl?: string
   countryCode?: string
@@ -93,10 +94,6 @@ function readRoster(value: unknown): CitoRosterPlayer[] {
       return []
     }
 
-    if (readString(entry.role)?.toLowerCase() === "coach") {
-      return []
-    }
-
     const nickname =
       readString(entry.playerNickname) ??
       readString(entry.nickname) ??
@@ -115,6 +112,7 @@ function readRoster(value: unknown): CitoRosterPlayer[] {
           readString(entry.id) ??
           `${nickname}-${index}`,
         nickname,
+        role: readString(entry.role),
         name: readString(entry.playerName) ?? readString(entry.name),
         imageUrl:
           readString(entry.playerImageUrl) ??
@@ -126,19 +124,25 @@ function readRoster(value: unknown): CitoRosterPlayer[] {
     ]
   })
 
-  return players.slice(0, 5)
+  return players
 }
 
 export function parseCitoRoster(value: unknown): CitoRosterPlayer[] {
-  if (
-    !isRecord(value) ||
-    value.success !== true ||
-    !Array.isArray(value.data)
-  ) {
+  if (!isRecord(value) || value.success !== true) {
     throw new Error("Odpowiedź API zwróciła nieprawidłowy skład drużyny.")
   }
 
-  return readRoster(value.data)
+  const roster = Array.isArray(value.data)
+    ? value.data
+    : isRecord(value.data)
+      ? (value.data.roster ?? value.data.players)
+      : undefined
+
+  if (!Array.isArray(roster)) {
+    throw new Error("Odpowiedź API zwróciła nieprawidłowy skład drużyny.")
+  }
+
+  return readRoster(roster)
 }
 
 function readTeam(

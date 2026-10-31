@@ -1,5 +1,5 @@
-import RoutePlaceholderPage from "@/components/RoutePlaceholderPage"
+import Compare from "@/components/Compare/Compare"
 
 export default function ComparePage() {
-  return <RoutePlaceholderPage title="Compare" />
+  return <Compare />
 }

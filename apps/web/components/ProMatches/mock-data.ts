@@ -5,21 +5,50 @@ import type {
   CitoTeam,
   ProMatchesResponse,
 } from "@/lib/cito-matches"
+import furiaLogo from "@/lib/MockLogo/furia.svg"
+import spiritLogo from "@/lib/MockLogo/team-spirit-seeklogo.png"
+import vitalityLogo from "@/lib/MockLogo/team-vitality-seeklogo.png"
 
-const demoPlayers = [
-  ["Nova", "PL"],
-  ["Byte", "SE"],
-  ["Echo", "DK"],
-  ["Pixel", "BR"],
-  ["Vex", "US"],
+const vitalityDemoPlayers = [
+  ["apEX", "FR", "IGL"],
+  ["ropz", "EE", "Rifler"],
+  ["ZywOo", "FR", "AWPer"],
+  ["flameZ", "IL", "Entry"],
+  ["mezii", "GB", "Rifler"],
+  ["XTQZZZ", "FR", "Coach"],
 ] as const
 
-function createTeam(id: string, name: string, countryName: string): CitoTeam {
-  const roster: CitoRosterPlayer[] = demoPlayers.map(
-    ([nickname, countryCode], index) => ({
+const spiritDemoPlayers = [
+  ["sh1ro", "RU", "AWPer"],
+  ["magixx", "RU", "IGL"],
+  ["tN1R", "BY", "Rifler"],
+  ["zont1x", "RU", "Support"],
+  ["donk", "RU", "Entry"],
+  ["hally", "RU", "Coach"],
+] as const
+
+const furiaDemoPlayers = [
+  ["FalleN", "BR", "IGL"],
+  ["yuurih", "BR", "Rifler"],
+  ["YEKINDAR", "LV", "Entry"],
+  ["KSCERATO", "BR", "Rifler"],
+  ["molodoy", "KZ", "AWPer"],
+  ["sidee", "BR", "Coach"],
+] as const
+
+function createTeam(
+  id: string,
+  name: string,
+  countryName: string,
+  players: readonly (readonly [string, string, string])[],
+  logoUrl: string
+): CitoTeam {
+  const roster: CitoRosterPlayer[] = players.map(
+    ([nickname, countryCode, role], index) => ({
       id: `${id}-player-${index + 1}`,
       nickname,
       countryCode,
+      role,
     })
   )
 
@@ -30,6 +59,7 @@ function createTeam(id: string, name: string, countryName: string): CitoTeam {
     countryName,
     worldRanking: 10 + id.length,
     roster,
+    logoUrl,
   }
 }
 
@@ -94,49 +124,28 @@ function createMatch({
   }
 }
 
-const liveTeams = [
-  [
-    createTeam("demo-live-1-team-1", "Pixel Wolves", "Poland"),
-    createTeam("demo-live-1-team-2", "Northstar", "Sweden"),
-  ],
-  [
-    createTeam("demo-live-2-team-1", "Red Circuit", "Denmark"),
-    createTeam("demo-live-2-team-2", "Blue Ember", "Brazil"),
-  ],
-  [
-    createTeam("demo-live-3-team-1", "Crimson Peak", "Canada"),
-    createTeam("demo-live-3-team-2", "Silverline", "Norway"),
-  ],
+const teams = [
+  createTeam(
+    "demo-vitality",
+    "Team Vitality",
+    "France",
+    vitalityDemoPlayers,
+    vitalityLogo.src
+  ),
+  createTeam(
+    "demo-spirit",
+    "Team Spirit",
+    "Russia",
+    spiritDemoPlayers,
+    spiritLogo.src
+  ),
+  createTeam("demo-furia", "FURIA", "Brazil", furiaDemoPlayers, furiaLogo.src),
 ] as const
 
-const upcomingTeams = [
-  [
-    createTeam("demo-upcoming-1-team-1", "Solaris", "France"),
-    createTeam("demo-upcoming-1-team-2", "Night Shift", "Germany"),
-  ],
-  [
-    createTeam("demo-upcoming-2-team-1", "Cloudbreak", "Finland"),
-    createTeam("demo-upcoming-2-team-2", "Ironclad", "United States"),
-  ],
-  [
-    createTeam("demo-upcoming-3-team-1", "Wildcards", "Canada"),
-    createTeam("demo-upcoming-3-team-2", "White Foxes", "Norway"),
-  ],
-] as const
-
-const recentTeams = [
-  [
-    createTeam("demo-recent-1-team-1", "Amber Five", "Poland"),
-    createTeam("demo-recent-1-team-2", "Stormbreak", "Ukraine"),
-  ],
-  [
-    createTeam("demo-recent-2-team-1", "Greenline", "Sweden"),
-    createTeam("demo-recent-2-team-2", "Night Shift", "Germany"),
-  ],
-  [
-    createTeam("demo-recent-3-team-1", "Solaris", "France"),
-    createTeam("demo-recent-3-team-2", "High Voltage", "Brazil"),
-  ],
+const matchups = [
+  [teams[0], teams[1]],
+  [teams[2], teams[0]],
+  [teams[1], teams[2]],
 ] as const
 
 const demoNow = new Date()
@@ -151,11 +160,11 @@ export const DEMO_MATCHES: ProMatchesResponse = {
       createMatch({
         id: "demo-live-1",
         eventId: "demo-event-live",
-        eventName: "FCStats Invitational",
+        eventName: "PGL Masters Bucharest 2026",
         status: "live",
         startsAt: recentTime(1),
-        team1: liveTeams[0][0],
-        team2: liveTeams[0][1],
+        team1: matchups[0][0],
+        team2: matchups[0][1],
         team1Score: 1,
         team2Score: 0,
         currentMap: "de_mirage",
@@ -164,11 +173,11 @@ export const DEMO_MATCHES: ProMatchesResponse = {
       createMatch({
         id: "demo-live-2",
         eventId: "demo-event-live",
-        eventName: "FCStats Invitational",
+        eventName: "PGL Major",
         status: "live",
         startsAt: recentTime(0.5),
-        team1: liveTeams[1][0],
-        team2: liveTeams[1][1],
+        team1: matchups[1][0],
+        team2: matchups[1][1],
         team1Score: 0,
         team2Score: 0,
         currentMap: "de_ancient",
@@ -177,11 +186,11 @@ export const DEMO_MATCHES: ProMatchesResponse = {
       createMatch({
         id: "demo-live-3",
         eventId: "demo-event-live",
-        eventName: "FCStats Invitational",
+        eventName: "Blast Rivals",
         status: "live",
         startsAt: recentTime(0.25),
-        team1: liveTeams[2][0],
-        team2: liveTeams[2][1],
+        team1: matchups[2][0],
+        team2: matchups[2][1],
         team1Score: 0,
         team2Score: 1,
         currentMap: "de_inferno",
@@ -194,33 +203,33 @@ export const DEMO_MATCHES: ProMatchesResponse = {
       createMatch({
         id: "demo-upcoming-1",
         eventId: "demo-event-major",
-        eventName: "Autumn Masters",
+        eventName: "PGL Masters Bucharest 2026",
         status: "upcoming",
         startsAt: upcomingTime(2),
-        team1: upcomingTeams[0][0],
-        team2: upcomingTeams[0][1],
+        team1: matchups[0][0],
+        team2: matchups[0][1],
         team1Score: null,
         team2Score: null,
       }),
       createMatch({
         id: "demo-upcoming-2",
         eventId: "demo-event-major",
-        eventName: "Autumn Masters",
+        eventName: "PGL Masters Bucharest 2026",
         status: "upcoming",
         startsAt: upcomingTime(3),
-        team1: upcomingTeams[1][0],
-        team2: upcomingTeams[1][1],
+        team1: matchups[1][0],
+        team2: matchups[1][1],
         team1Score: null,
         team2Score: null,
       }),
       createMatch({
         id: "demo-upcoming-3",
         eventId: "demo-event-open",
-        eventName: "Community Cup",
+        eventName: "Blast Rivals",
         status: "upcoming",
         startsAt: upcomingTime(5),
-        team1: upcomingTeams[2][0],
-        team2: upcomingTeams[2][1],
+        team1: matchups[2][0],
+        team2: matchups[2][1],
         team1Score: null,
         team2Score: null,
       }),
@@ -231,11 +240,11 @@ export const DEMO_MATCHES: ProMatchesResponse = {
       createMatch({
         id: "demo-recent-1",
         eventId: "demo-event-major",
-        eventName: "Autumn Masters",
+        eventName: "Blast Rivals",
         status: "completed",
         startsAt: recentTime(3),
-        team1: recentTeams[0][0],
-        team2: recentTeams[0][1],
+        team1: matchups[0][0],
+        team2: matchups[0][1],
         team1Score: 2,
         team2Score: 1,
         maps: [
@@ -247,11 +256,11 @@ export const DEMO_MATCHES: ProMatchesResponse = {
       createMatch({
         id: "demo-recent-2",
         eventId: "demo-event-major",
-        eventName: "Autumn Masters",
+        eventName: "Blast Rivals",
         status: "completed",
         startsAt: recentTime(5),
-        team1: recentTeams[1][0],
-        team2: recentTeams[1][1],
+        team1: matchups[1][0],
+        team2: matchups[1][1],
         team1Score: 0,
         team2Score: 2,
         maps: [
@@ -262,11 +271,11 @@ export const DEMO_MATCHES: ProMatchesResponse = {
       createMatch({
         id: "demo-recent-3",
         eventId: "demo-event-open",
-        eventName: "Community Cup",
+        eventName: "PGL Masters Bucharest 2026",
         status: "completed",
         startsAt: recentTime(8),
-        team1: recentTeams[2][0],
-        team2: recentTeams[2][1],
+        team1: matchups[2][0],
+        team2: matchups[2][1],
         team1Score: 2,
         team2Score: 0,
         maps: [

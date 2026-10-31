@@ -81,7 +81,7 @@ export default function MatchCard({
 
     try {
       const response = await fetch(
-        `/api/cs2/teams/${encodeURIComponent(team.id)}/roster`,
+        `/api/cs2/teams/${encodeURIComponent(team.name)}/roster`,
         { cache: "no-store" }
       )
       const result = (await response.json()) as {

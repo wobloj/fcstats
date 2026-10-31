@@ -56,24 +56,29 @@ export default function ProMatches() {
         <section
           aria-labelledby="pro-matches-test-heading"
           aria-modal="true"
-          className="w-full max-w-xl rounded-2xl border border-border bg-card p-6 shadow-2xl sm:p-10"
+          className="w-full max-w-xl sm:p-10"
           role="dialog"
         >
-          <div className="mb-6 flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
-            <FlaskConical aria-hidden="true" className="size-7" />
+          <div className="flex flex-row items-center gap-4">
+            <div className="flex size-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <FlaskConical aria-hidden="true" className="size-7" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold tracking-[0.18em] text-primary uppercase">
+                Matches
+              </p>
+              <h1
+                id="pro-matches-test-heading"
+                className="text-2xl font-bold tracking-tight sm:text-3xl"
+              >
+                This section is in testing phase
+              </h1>
+            </div>
           </div>
-          <p className="mb-2 text-sm font-semibold tracking-[0.18em] text-primary uppercase">
-            Pro Matches
-          </p>
-          <h1
-            id="pro-matches-test-heading"
-            className="text-2xl font-bold tracking-tight sm:text-3xl"
-          >
-            Ta podstrona jest w fazie testów
-          </h1>
-          <p className="mt-4 leading-relaxed text-muted-foreground">
-            Wybierz przykładowe dane, aby pracować nad widokiem bez wysyłania
-            zapytań do Cito. Możesz też przejść do danych na żywo z API.
+          <p className="mt-4 text-center leading-relaxed text-muted-foreground">
+            Choose between example data or try to load data from API. Loading
+            data from API does not provide stability. Loading example data shows
+            how this site looks.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <button
@@ -82,10 +87,10 @@ export default function ProMatches() {
                 setData(DEMO_MATCHES)
                 setMode("demo")
               }}
-              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 font-semibold text-primary-foreground transition-colors hover:bg-primary/90"
+              className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2.5 text-primary-foreground transition-colors hover:bg-primary/90"
             >
               <Database aria-hidden="true" className="size-4" />
-              Załaduj dane testowe
+              Load example data
             </button>
             <button
               type="button"
@@ -93,11 +98,11 @@ export default function ProMatches() {
               className="inline-flex min-h-11 flex-1 items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 py-2.5 font-medium transition-colors hover:bg-muted"
             >
               <Radio aria-hidden="true" className="size-4" />
-              Załaduj dane z API
+              Load data from API
             </button>
           </div>
-          <p className="mt-5 text-xs text-muted-foreground">
-            Dane testowe są lokalne i nie zużywają limitu zapytań API.
+          <p className="mt-5 text-center text-xs text-muted-foreground/50">
+            Example data are local and does not provide correct informations.
           </p>
         </section>
       </main>

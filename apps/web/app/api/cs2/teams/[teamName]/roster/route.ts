@@ -5,13 +5,17 @@ const CITO_API_BASE_URL = "https://api.citoapi.com/api/v1/cs2"
 
 export async function GET(
   _request: Request,
-  { params }: { params: Promise<{ teamId: string }> }
+  { params }: { params: Promise<{ teamName: string }> }
 ) {
-  const { teamId } = await params
+  const { teamName } = await params
 
-  if (!/^[a-zA-Z0-9-]{1,100}$/.test(teamId)) {
+  if (
+    !teamName.trim() ||
+    teamName.length > 100 ||
+    /[\/\\\u0000-\u001f]/.test(teamName)
+  ) {
     return NextResponse.json(
-      { error: "Podano nieprawidłowy identyfikator drużyny." },
+      { error: "Podano nieprawidłową nazwę drużyny." },
       { status: 400 }
     )
   }
@@ -26,7 +30,7 @@ export async function GET(
 
   try {
     const response = await fetch(
-      `${CITO_API_BASE_URL}/teams/${encodeURIComponent(teamId)}/roster`,
+      `${CITO_API_BASE_URL}/teams/${encodeURIComponent(teamName)}`,
       {
         headers: {
           "x-api-key": apiKey,

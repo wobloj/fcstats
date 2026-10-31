@@ -1,0 +1,263 @@
+import type { ComparisonCategory } from "./types"
+
+// Edit these category definitions to choose which stats are compared.
+export const COMPARISON_CATEGORIES: ComparisonCategory[] = [
+  {
+    title: "Basic Stats",
+    stats: [
+      {
+        label: "KDA (K/D)",
+        source: "basic",
+        sourceKeys: ["kda"],
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Average headshots",
+        source: "basic",
+        sourceKeys: ["avgHeadshot"],
+        suffix: "%",
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "ADR",
+        source: "basic",
+        sourceKeys: ["adr"],
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Average damage",
+        source: "basic",
+        sourceKeys: ["avgDamage"],
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Win rate",
+        source: "basic",
+        sourceKeys: ["winRate"],
+        suffix: "%",
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Matches",
+        source: "basic",
+        sourceKeys: ["matches"],
+        better: "higher",
+      },
+    ],
+  },
+  {
+    title: "Rankings",
+    stats: [
+      {
+        label: "FACEIT Elo",
+        source: "game",
+        sourceKeys: ["faceit_elo"],
+        better: "higher",
+      },
+      {
+        label: "Skill level",
+        source: "game",
+        sourceKeys: ["skill_level"],
+        better: "higher",
+      },
+      {
+        label: "Regional rank",
+        source: "rankings",
+        sourceKeys: ["regional"],
+        prefix: "#",
+        better: "lower",
+      },
+      {
+        label: "Global rank",
+        source: "rankings",
+        sourceKeys: ["global"],
+        prefix: "#",
+        better: "lower",
+      },
+    ],
+  },
+  {
+    title: "Utility",
+    stats: [
+      {
+        label: "Utility damage success rate",
+        source: "advanced",
+        sourceKeys: ["Utility damage success rate"],
+        suffix: "%",
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Total flash count",
+        source: "advanced",
+        sourceKeys: ["Total flash count", "Flash count", "Total flashes"],
+        better: "higher",
+      },
+      {
+        label: "Enemies flashed per round",
+        source: "advanced",
+        sourceKeys: ["Enemies flashed per round"],
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Total enemies flashed",
+        source: "advanced",
+        sourceKeys: ["Total enemies flashed"],
+        better: "higher",
+      },
+      {
+        label: "Utility usage per round",
+        source: "advanced",
+        sourceKeys: ["Utility usage per round"],
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Flash per round",
+        source: "advanced",
+        sourceKeys: ["Flash per round", "Flashes per round"],
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Total utility count",
+        source: "advanced",
+        sourceKeys: ["Total utility count"],
+        better: "higher",
+      },
+      {
+        label: "Flash success rate",
+        source: "advanced",
+        sourceKeys: ["Flash success rate"],
+        suffix: "%",
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Total utility damage",
+        source: "advanced",
+        sourceKeys: ["Total utility damage"],
+        better: "higher",
+      },
+      {
+        label: "Total utility successes",
+        source: "advanced",
+        sourceKeys: ["Total utility successes", "Utility successes"],
+        better: "higher",
+      },
+    ],
+  },
+  {
+    title: "Entry",
+    stats: [
+      {
+        label: "Total entry count",
+        source: "advanced",
+        sourceKeys: ["Total entry count"],
+        better: "higher",
+      },
+      {
+        label: "Entry success rate",
+        source: "advanced",
+        sourceKeys: ["Entry success rate"],
+        suffix: "%",
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Total entry wins",
+        source: "advanced",
+        sourceKeys: ["Total entry wins", "Entry wins"],
+        better: "higher",
+      },
+      {
+        label: "Entry rate",
+        source: "advanced",
+        sourceKeys: ["Entry rate"],
+        suffix: "%",
+        precision: 2,
+        better: "higher",
+      },
+    ],
+  },
+  {
+    title: "1vX",
+    stats: [
+      {
+        label: "Total 1v1 count",
+        source: "advanced",
+        sourceKeys: ["Total 1v1 Count"],
+        better: "higher",
+      },
+      {
+        label: "1v1 rate",
+        source: "advanced",
+        sourceKeys: ["1v1 rate", "1v1 Win Rate", "1v1 win rate"],
+        suffix: "%",
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Total 1v1 wins",
+        source: "advanced",
+        sourceKeys: ["Total 1v1 Wins"],
+        better: "higher",
+      },
+      {
+        label: "Total 1v2 count",
+        source: "advanced",
+        sourceKeys: ["Total 1v2 Count"],
+        better: "higher",
+      },
+      {
+        label: "1v2 rate",
+        source: "advanced",
+        sourceKeys: ["1v2 rate", "1v2 Win Rate", "1v2 win rate"],
+        suffix: "%",
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Total 1v2 wins",
+        source: "advanced",
+        sourceKeys: ["Total 1v2 Wins"],
+        better: "higher",
+      },
+    ],
+  },
+  {
+    title: "AWP",
+    stats: [
+      {
+        label: "Sniper kill rate",
+        source: "advanced",
+        sourceKeys: ["Sniper kill rate", "Sniper Kill Rate"],
+        suffix: "%",
+        precision: 2,
+        better: "higher",
+      },
+      {
+        label: "Total sniper kills",
+        source: "advanced",
+        sourceKeys: ["Total sniper kills", "Sniper Kills"],
+        better: "higher",
+      },
+      {
+        label: "Sniper kill rate per round",
+        source: "advanced",
+        sourceKeys: [
+          "Sniper Kill Rate per Round",
+          "Sniper kill rate per round",
+        ],
+        precision: 2,
+        better: "higher",
+      },
+    ],
+  },
+]
