@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
 import Header from "@/components/Header/Header"
 import DecorativeGlow from "@/components/DecorativeGlow"
 import HomePage from "@/components/Home/HomePage"
@@ -56,6 +57,7 @@ export default function PlayerSearchPage({
 }: {
   initialNickname?: string
 }) {
+  const router = useRouter()
   const search = useFaceitPlayerSearch()
   const initialNicknameHandled = useRef<string | null>(null)
   const [recentSearches, setRecentSearches] = useState<RecentPlayerSearch[]>([])
@@ -70,6 +72,17 @@ export default function PlayerSearchPage({
     initialNicknameHandled.current = searchTerm
     void search.searchPlayer(searchTerm)
   }, [initialNickname, search.searchPlayer])
+
+  function handleSearch(nickname: string) {
+    const searchTerm = nickname.trim()
+    if (!searchTerm) {
+      return
+    }
+
+    initialNicknameHandled.current = searchTerm
+    router.push(`/?nickname=${encodeURIComponent(searchTerm)}`)
+    void search.searchPlayer(searchTerm)
+  }
 
   useEffect(() => {
     setRecentSearches(readRecentSearches())
@@ -128,7 +141,7 @@ export default function PlayerSearchPage({
   }, [search.data])
 
   const searchbarProps = {
-    onSubmit: search.searchPlayer,
+    onSubmit: handleSearch,
     isLoading: search.loading,
     recentSearches,
   }
